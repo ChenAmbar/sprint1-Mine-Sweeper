@@ -3,12 +3,15 @@
 const MINE = '💣'
 const FLAG = '🚩'
 const EMPTY = '.'
-const FLAG_FAILE='🏳️'
+const FLAG_FAILE = '🏳️'
+const LIFE = '❤️'
+
 
 var gBoardGame
 var gBoard
 var gLevel
 var gGame
+var gCountMine = 3
 // var size = 4
 
 gLevel = {
@@ -27,12 +30,12 @@ function onInit() {
         secsPassed: 0
     }
 
-    bottons()
     gBoard = creatBoard(gLevel.SIZE)
     setMinesNegsCount(gBoard)
     countAllNeighborsInBoard(gBoard)
     renderBoard(gBoard, '.game-bord')
     renderGgame()
+    lifeCount(gCountMine)
 
 
 
@@ -42,6 +45,7 @@ function onInit() {
 }
 
 function setMinesNegsCount(board) {
+    
 
     if (gLevel.SIZE === 4) {
         for (var i = 0; i < gLevel.MINES; i++) {
@@ -68,35 +72,41 @@ function setMinesNegsCount(board) {
 }
 
 function cellClicked(i, j) {
-    var cell = {
+    if (!gGame.isOn) {
+        return
+    }
+
+    const cell = {
         i: i,
         j: j
     }
+    
     if (gBoard[i][j].isShown) return
     if (gBoard[i][j].isMarked) return
     if (gBoard[i][j].isMine) {
 
+        gCountMine--
+        lifeCount(gCountMine)
         renderCell(cell, MINE)
         setTimeout(function () {
-            renderCell(cell,FLAG_FAILE)
+            renderCell(cell, FLAG_FAILE)
         }, 1500)
-        gBoard[i][j].isMarked=true
+        gBoard[i][j].isMarked = true
         gGame.markedCount++
+        
     } else if (gBoard[i][j].minesAroundCount === 0) {
         ShownNeighbors(i, j, gBoard)
         gBoard[i][j].isShown = true
         renderCell(cell, gBoard[i][j].minesAroundCount)
-
+        
     } else {
-
+        
         gBoard[i][j].isShown = true
         renderCell(cell, gBoard[i][j].minesAroundCount)
     }
-
+    
     checkGameOver()
     renderGgame()
-
-
 
 }
 
@@ -126,18 +136,20 @@ function onCellMarked(i, j) {
         i: i,
         j: j
     }
+    const cell = gBoard[markCell.i][markCell.j]
 
-
-    if (gBoard[markCell.i][markCell.j].isMarked) {
-        gBoard[markCell.i][markCell.j].isMarked = false
-        gGame.markedCount -= 1
-        
-        renderCell(markCell, '')
-    } else if (gBoard[markCell.i][markCell.j].isMine) {
+    if (cell.isMine && cell.isMarked) {
         return
+
+
+    } else if (cell.isMarked) {
+        gGame.markedCount -= 1
+
+        renderCell(markCell, '')
+        cell.isMarked = false
     } else {
 
-        gBoard[markCell.i][markCell.j].isMarked = true
+        cell.isMarked = true
         gGame.markedCount += 1
         renderCell(markCell, FLAG)
     }
@@ -170,28 +182,29 @@ function ShownNeighbors(cellI, cellJ, mat) {
 }
 function checkGameOver() {
     var countCellShown = 0
-    var countCellMine = 0
+    var countCellMarked = 0
     for (var i = 0; i < gBoard.length; i++) {
         for (var j = 0; j < gBoard[0].length; j++) {
             if (gBoard[i][j].isShown) {
                 countCellShown++
                 gGame.shownCount = countCellShown
             }
-            if (gBoard[i][j].isShown && gBoard[i][j].isMine) {
-                countCellMine++
+            if (gBoard[i][j].isMarked) {
+                countCellMarked++
             }
+            
         }
 
     }
-    if (countCellMine === 3) {
+    if (gCountMine === 0) {
 
-        gGame.isOn = false
+       gGame.isOn = false
     }
     console.log(countCellShown);
-    if (countCellShown === (gLevel.SIZE ** 2)- gGame.markedCount && gLevel.MINES === gGame.markedCount) {
+    if (countCellShown === (gLevel.SIZE ** 2) - countCellMarked && gLevel.MINES === countCellMarked) {
         gGame.isOn = false
-        console.log('game over');
     }
+    console.log(gGame.isOn);
     console.log(gGame);
 }
 
@@ -207,7 +220,7 @@ function bottons() {
 
 }
 function buttonLavel(level) {
-console.log(level);
+    console.log(level);
     if (level === 4) {
         gLevel.SIZE = 4
         gLevel.MINES = 2
@@ -236,13 +249,40 @@ function renderGgame() {
 
     var emoji = "🙂"
     var emojiWin = "😁"
+    var emojiLose = '💀'
     const elEmoji = document.querySelector(".emoji")
     console.log(gGame.isOn);
     if (!gGame.isOn) {
         elEmoji.innerHTML = emojiWin
+    }
+    if (gCountMine === 0) {
+
+        elEmoji.innerHTML = emojiLose
     } else {
+
         elEmoji.innerHTML = emoji
     }
+    bottons()
+
+
+}
+
+function emojiClick() {
+    onInit()
+}
+
+function lifeCount(gCountMine) {
+
+    var life = ''
+    for (var i = 0; i < gCountMine; i++) {
+        life += LIFE
+    }
+    const elLife = document.querySelector(".life")
+
+    elLife.innerHTML = life
+    console.log(life);
+
+
 }
 
 

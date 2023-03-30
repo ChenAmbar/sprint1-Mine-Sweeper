@@ -23,7 +23,7 @@ function creatBoard(size) {
 function renderBoard(mat, selector) {
 
 
-    var strHTML = `<table border="1"><tr><th colspan="${gLevel.SIZE}" ><span class="counter"></span></span><button class="emoji"></button><span class="flag"><span class="sec"></span></th></tr><tbody>`
+    var strHTML = `<table border="1"><tr><th colspan="${gLevel.SIZE}" ><span class="counter"></span></span><button onclick="emojiClick()" class="emoji"></button><span class="flag"><span class="sec"></span></th></tr><tbody>`
     for (var i = 0; i < mat.length; i++) {
 
         strHTML += '<tr>'
