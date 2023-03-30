@@ -1,0 +1,33 @@
+table{
+    /* width: 240px;
+    height: 285px; */
+    border: thin;
+    background-color: darkgrey;
+}
+body{
+    
+    text-align: -webkit-center;
+}
+td{
+    width: 23px;
+    height: 23px;
+    text-align: center;
+}
+
+.cell{
+    border: inset;
+    background-color: rgb(234, 226, 226);
+}
+th{
+    height: 45px;
+    background-color: rgb(234, 226, 226);
+    text-align: -webkit-center;
+}
+.flag{
+    margin-left: 28%;
+}
+
+.emoji{
+    margin-right: -19%;
+    margin-left: 14%;
+}
