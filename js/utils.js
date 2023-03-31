@@ -16,7 +16,7 @@ function creatBoard(size) {
         }
 
     }
-    console.log(board);
+    // console.log(board);
     return board
 }
 
@@ -60,7 +60,7 @@ function getRandomLocations(bord) {
 
     }
     const randIdx = getRandomInt(0, locations.length)
-    console.log(locations[randIdx]);
+    // console.log(locations[randIdx]);
     return locations[randIdx]
 }
 function getRandomInt(min, max) {
@@ -72,19 +72,42 @@ function renderCell(location, value) {
     const elCell = document.querySelector(`.cell-${location.i}-${location.j}`)
     if (value === 0) {
         elCell.style.backgroundColor = "gray"
-    
-    
-    }else if (gBoard[location.i][location.j].isMarked || gBoard[location.i][location.j].isMine||gBoard[location.i][location.j].isMarked || value==='') {
-        
+
+
+    } else if (gBoard[location.i][location.j].isMine ||( value === EMPTY &&!gBoard[location.i][location.j].isMarked)) {
+        if (gCountMine >= 0) {
+            elCell.style.backgroundColor = "red"
+        }
         elCell.innerHTML = value
-        
-        
+    } else if (gBoard[location.i][location.j].isMarked || value === EMPTY) {
+        elCell.innerHTML = value
+
     } else {
-        
         elCell.style.backgroundColor = "gray"
         elCell.innerHTML = value
-        
     }
+
+
+
+
+
+
+    // else if (gBoard[location.i][location.j].isMarked || gBoard[location.i][location.j].isMine|| value===EMPTY) {
+    //     if(gCountMine >0){
+    //         elCell.style.backgroundColor = "red"
+    //         elCell.innerHTML = value
+    //     }else{
+
+    //         elCell.innerHTML = value
+    //     }
+
+
+    // } else {
+
+    //     elCell.style.backgroundColor = "gray"
+    //     elCell.innerHTML = value
+
+    // }
 
 
 

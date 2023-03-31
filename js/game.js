@@ -2,7 +2,7 @@
 
 const MINE = '💣'
 const FLAG = '🚩'
-const EMPTY = '.'
+const EMPTY = ''
 const FLAG_FAILE = '🏳️'
 const LIFE = '❤️'
 
@@ -11,7 +11,7 @@ var gBoardGame
 var gBoard
 var gLevel
 var gGame
-var gCountMine = 3
+var gCountMine 
 // var size = 4
 
 gLevel = {
@@ -21,7 +21,8 @@ gLevel = {
 
 
 function onInit() {
-
+    
+    gCountMine = 3
 
     gGame = {
         isOn: true,
@@ -32,6 +33,7 @@ function onInit() {
 
     gBoard = creatBoard(gLevel.SIZE)
     setMinesNegsCount(gBoard)
+
     countAllNeighborsInBoard(gBoard)
     renderBoard(gBoard, '.game-bord')
     renderGgame()
@@ -45,7 +47,7 @@ function onInit() {
 }
 
 function setMinesNegsCount(board) {
-    
+
 
     if (gLevel.SIZE === 4) {
         for (var i = 0; i < gLevel.MINES; i++) {
@@ -80,7 +82,7 @@ function cellClicked(i, j) {
         i: i,
         j: j
     }
-    
+
     if (gBoard[i][j].isShown) return
     if (gBoard[i][j].isMarked) return
     if (gBoard[i][j].isMine) {
@@ -89,22 +91,23 @@ function cellClicked(i, j) {
         lifeCount(gCountMine)
         renderCell(cell, MINE)
         setTimeout(function () {
-            renderCell(cell, FLAG_FAILE)
+            renderCell(cell, EMPTY)
         }, 1500)
-        gBoard[i][j].isMarked = true
-        gGame.markedCount++
-        
+        // gBoard[i][j].isMarked = true
+        // gGame.markedCount++
+
     } else if (gBoard[i][j].minesAroundCount === 0) {
         ShownNeighbors(i, j, gBoard)
-        gBoard[i][j].isShown = true
+        // gBoard[i][j].isShown = true
         renderCell(cell, gBoard[i][j].minesAroundCount)
-        
+
     } else {
-        
+
+        gGame.shownCount++
         gBoard[i][j].isShown = true
         renderCell(cell, gBoard[i][j].minesAroundCount)
     }
-    
+
     checkGameOver()
     renderGgame()
 
@@ -115,8 +118,8 @@ function countNeighbors(cellI, cellJ, mat) {
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= mat.length) continue
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
-            if (i === cellI && j === cellJ) continue
             if (j < 0 || j >= mat[i].length) continue
+            if (j === cellJ && i === cellJ) continue
             if (mat[i][j].isMine) neighborsCount++
         }
     }
@@ -138,15 +141,13 @@ function onCellMarked(i, j) {
     }
     const cell = gBoard[markCell.i][markCell.j]
 
-    if (cell.isMine && cell.isMarked) {
-        return
-
-
-    } else if (cell.isMarked) {
+    if (cell.isMarked) {
         gGame.markedCount -= 1
 
-        renderCell(markCell, '')
+        renderCell(markCell, EMPTY)
         cell.isMarked = false
+    } else if (cell.isShown) {
+        return
     } else {
 
         cell.isMarked = true
@@ -163,17 +164,16 @@ function ShownNeighbors(cellI, cellJ, mat) {
     for (var i = cellI - 1; i <= cellI + 1; i++) {
         if (i < 0 || i >= mat.length) continue
         for (var j = cellJ - 1; j <= cellJ + 1; j++) {
-            if (i === cellI && j === cellJ) continue
             if (j < 0 || j >= mat[i].length) continue
             const location = {
                 i: i,
                 j: j
             }
-            if (gBoard[i][j].isMarked) {
+            if (gBoard[i][j].isMarked || gBoard[i][j].isShown) {
                 continue
             } else {
-
                 gBoard[i][j].isShown = true
+                gGame.shownCount++
                 renderCell(location, gBoard[i][j].minesAroundCount)
             }
         }
@@ -181,29 +181,16 @@ function ShownNeighbors(cellI, cellJ, mat) {
 
 }
 function checkGameOver() {
-    var countCellShown = 0
-    var countCellMarked = 0
-    for (var i = 0; i < gBoard.length; i++) {
-        for (var j = 0; j < gBoard[0].length; j++) {
-            if (gBoard[i][j].isShown) {
-                countCellShown++
-                gGame.shownCount = countCellShown
-            }
-            if (gBoard[i][j].isMarked) {
-                countCellMarked++
-            }
-            
-        }
-
-    }
+    
     if (gCountMine === 0) {
 
-       gGame.isOn = false
-    }
-    console.log(countCellShown);
-    if (countCellShown === (gLevel.SIZE ** 2) - countCellMarked && gLevel.MINES === countCellMarked) {
+        gGame.isOn = false
+    } else if (gGame.shownCount=== (gLevel.SIZE ** 2) - gGame.markedCount && gLevel.MINES === gGame.markedCount) {
+
         gGame.isOn = false
     }
+    // console.log(countCellShown);
+
     console.log(gGame.isOn);
     console.log(gGame);
 }
@@ -252,13 +239,13 @@ function renderGgame() {
     var emojiLose = '💀'
     const elEmoji = document.querySelector(".emoji")
     console.log(gGame.isOn);
-    if (!gGame.isOn) {
-        elEmoji.innerHTML = emojiWin
-    }
+    
     if (gCountMine === 0) {
 
         elEmoji.innerHTML = emojiLose
-    } else {
+    } else if (!gGame.isOn) {
+        elEmoji.innerHTML = emojiWin
+    }else{
 
         elEmoji.innerHTML = emoji
     }
@@ -268,6 +255,7 @@ function renderGgame() {
 }
 
 function emojiClick() {
+    gGame.isOn = true
     onInit()
 }
 
